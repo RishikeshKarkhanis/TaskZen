@@ -2,12 +2,38 @@ import { useEffect, useState } from "react";
 import Button from "../common/Button";
 import { X, LoaderCircle } from "lucide-react";
 
-function TaskModal({ isOpen, mode = "create", task = null, loading = false, onClose, onSubmit }) {
+const CATEGORY_OPTIONS = [
+  { label: "College", value: "COLLEGE" },
+  { label: "Work", value: "WORK" },
+  { label: "Personal", value: "PERSONAL" },
+  { label: "Health", value: "HEALTH" },
+];
+
+const PRIORITY_OPTIONS = [
+  { label: "Low", value: "LOW" },
+  { label: "Medium", value: "MEDIUM" },
+  { label: "High", value: "HIGH" },
+];
+
+const STATUS_OPTIONS = [
+  { label: "Todo", value: "TODO" },
+  { label: "In Progress", value: "IN_PROGRESS" },
+  { label: "Completed", value: "COMPLETED" },
+];
+
+function TaskModal({
+  isOpen,
+  mode = "create",
+  task = null,
+  loading = false,
+  onClose,
+  onSubmit,
+}) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("Personal");
-  const [priority, setPriority] = useState("Medium");
-  const [status, setStatus] = useState("Todo");
+  const [category, setCategory] = useState("PERSONAL");
+  const [priority, setPriority] = useState("MEDIUM");
+  const [status, setStatus] = useState("TODO");
   const [dueDate, setDueDate] = useState("");
 
   const [errors, setErrors] = useState({});
@@ -16,18 +42,16 @@ function TaskModal({ isOpen, mode = "create", task = null, loading = false, onCl
     if (task) {
       setTitle(task.title || "");
       setDescription(task.description || "");
-      setCategory(task.category || "Personal");
-      setPriority(task.priority || "Medium");
-      setStatus(task.status || "Todo");
+      setCategory(task.category || "PERSONAL");
+      setPriority(task.priority || "MEDIUM");
+      setStatus(task.status || "TODO");
       setDueDate(task.dueDate || "");
-    }
-
-    else {
+    } else {
       setTitle("");
       setDescription("");
-      setCategory("Personal");
-      setPriority("Medium");
-      setStatus("Todo");
+      setCategory("PERSONAL");
+      setPriority("MEDIUM");
+      setStatus("TODO");
       setDueDate("");
     }
 
@@ -61,14 +85,12 @@ function TaskModal({ isOpen, mode = "create", task = null, loading = false, onCl
   };
 
   const handleSubmit = async () => {
-
     if (!validate()) return;
 
     try {
-
       await onSubmit({
-        title,
-        description,
+        title: title.trim(),
+        description: description.trim(),
         category,
         priority,
         status,
@@ -76,23 +98,18 @@ function TaskModal({ isOpen, mode = "create", task = null, loading = false, onCl
       });
 
       onClose();
-
     } catch (error) {
-      // Modal open rahega agar request fail ho
+      console.error(error);
     }
-
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 overflow-y-auto">
       <div className="flex min-h-full items-center justify-center p-4">
-
         <div className="w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl bg-white shadow-2xl flex flex-col">
 
           {/* Header */}
-
           <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-
             <h2 className="text-2xl font-bold text-slate-900">
               {mode === "create" ? "Create New Task" : "Edit Task"}
             </h2>
@@ -103,17 +120,13 @@ function TaskModal({ isOpen, mode = "create", task = null, loading = false, onCl
             >
               <X size={20} />
             </button>
-
           </div>
 
           {/* Body */}
-
           <div className="flex-1 overflow-y-auto space-y-5 p-6">
 
             {/* Title */}
-
             <div>
-
               <label className="mb-2 block text-sm font-medium">
                 Task Title *
               </label>
@@ -130,14 +143,13 @@ function TaskModal({ isOpen, mode = "create", task = null, loading = false, onCl
                   {errors.title}
                 </p>
               )}
-
             </div>
 
             {/* Description */}
-
             <div>
-
-              <label className="mb-2 block text-sm font-medium">Description</label>
+              <label className="mb-2 block text-sm font-medium">
+                Description
+              </label>
 
               <textarea
                 rows={4}
@@ -151,100 +163,79 @@ function TaskModal({ isOpen, mode = "create", task = null, loading = false, onCl
                   {errors.description}
                 </p>
               )}
-
             </div>
 
             {/* Category */}
-
             <div>
-
-              <label className="mb-2 block text-sm font-medium">Category</label>
+              <label className="mb-2 block text-sm font-medium">
+                Category
+              </label>
 
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full rounded-xl border border-slate-200 p-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
               >
-                <option>College</option>
-                <option>Work</option>
-                <option>Personal</option>
-                <option>Health</option>
+                {CATEGORY_OPTIONS.map((item) => (
+                  <option key={item.value} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
               </select>
-
             </div>
 
             {/* Priority */}
-
             <div>
-
               <label className="mb-2 block text-sm font-medium">
                 Priority
               </label>
 
               <div className="flex flex-wrap gap-6">
-
-                {["Low", "Medium", "High"].map((item) => (
-
+                {PRIORITY_OPTIONS.map((item) => (
                   <label
-                    key={item}
+                    key={item.value}
                     className="flex items-center gap-2 cursor-pointer"
                   >
-
                     <input
                       type="radio"
-                      value={item}
-                      checked={priority === item}
+                      value={item.value}
+                      checked={priority === item.value}
                       onChange={(e) => setPriority(e.target.value)}
                     />
 
-                    {item}
-
+                    {item.label}
                   </label>
-
                 ))}
-
               </div>
-
             </div>
 
             {/* Status */}
-
             <div>
-
               <label className="mb-2 block text-sm font-medium">
                 Status
               </label>
 
               <div className="flex flex-wrap gap-6">
-
-                {["Todo", "In Progress", "Completed"].map((item) => (
-
+                {STATUS_OPTIONS.map((item) => (
                   <label
-                    key={item}
+                    key={item.value}
                     className="flex items-center gap-2 cursor-pointer"
                   >
-
                     <input
                       type="radio"
-                      value={item}
-                      checked={status === item}
+                      value={item.value}
+                      checked={status === item.value}
                       onChange={(e) => setStatus(e.target.value)}
                     />
 
-                    {item}
-
+                    {item.label}
                   </label>
-
                 ))}
-
               </div>
-
             </div>
 
             {/* Due Date */}
-
             <div>
-
               <label className="mb-2 block text-sm font-medium">
                 Due Date *
               </label>
@@ -261,19 +252,13 @@ function TaskModal({ isOpen, mode = "create", task = null, loading = false, onCl
                   {errors.dueDate}
                 </p>
               )}
-
             </div>
 
           </div>
 
           {/* Footer */}
-
           <div className="flex justify-end gap-3 border-t border-slate-200 p-6">
-
-            <Button
-              variant="secondary"
-              onClick={onClose}
-            >
+            <Button variant="secondary" onClick={onClose}>
               Cancel
             </Button>
 
@@ -289,17 +274,15 @@ function TaskModal({ isOpen, mode = "create", task = null, loading = false, onCl
                   />
                   Saving...
                 </>
+              ) : mode === "create" ? (
+                "Save Task"
               ) : (
-                mode === "create"
-                  ? "Save Task"
-                  : "Update Task"
+                "Update Task"
               )}
             </Button>
-
           </div>
 
         </div>
-
       </div>
     </div>
   );
