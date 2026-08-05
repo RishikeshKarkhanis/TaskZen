@@ -47,14 +47,14 @@ function Dashboard() {
     };
 
     const handleEdit = (id) => {
-        const task = tasks.find((t) => t._id === id);
+        const task = tasks.find((t) => t.id === id);
         setSelectedTask(task);
         setIsTaskModalOpen(true);
     };
 
     const handleSaveTask = async (taskData) => {
         if (selectedTask) {
-            await updateExistingTask(selectedTask._id, taskData);
+            await updateExistingTask(selectedTask.id, taskData);
         }
         else {
             await createNewTask(taskData);
